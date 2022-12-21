@@ -388,8 +388,16 @@ void updateDriver() {
     printf("\n\n\e[0m");
 
     int found = 0;
-    for (int i = 0; i < driverInfo.numDrivers; i++) {
-        if (strcmp(driverInfo.drivers[i].license_number, license_number) == 0 && strcmp(driverInfo.drivers[i].agency_code, agency_code) == 0) {
+    for (int i = 0; i < driverInfo.numDrivers; i++){
+        if (strcmp(driverInfo.drivers[i].license_number, license_number) == 0 && strcmp(driverInfo.drivers[i].agency_code, agency_code) == 0){
+            for (int j = i; j < driverInfo.numDrivers - 1; j++) {
+                driverInfo.drivers[j] = driverInfo.drivers[j + 1];
+            }
+            driverInfo.numDrivers--;
+
+            struct Driver driver;
+
+            int i;
             int valid_license_number = 0;
             int valid_agency_code = 0;
             int valid_serial_number = 0;
@@ -398,13 +406,13 @@ void updateDriver() {
 
             while (!valid_license_number){
                 printf("                  \e[0;37mEnter driver's new license number. Format: Hxx-xx-xxxxxx: \e[0;92m");
-                scanf("%14s", driverInfo.drivers[i].license_number);
-                if(driverInfo.drivers[i].license_number[0] == 'H' &&
-                    isdigit(driverInfo.drivers[i].license_number[1]) && isdigit(driverInfo.drivers[i].license_number[2]) &&
-                    driverInfo.drivers[i].license_number[3] == '-' && isdigit(driverInfo.drivers[i].license_number[4]) && isdigit(driverInfo.drivers[i].license_number[5]) &&
-                    driverInfo.drivers[i].license_number[6] == '-' && isdigit(driverInfo.drivers[i].license_number[7]) && isdigit(driverInfo.drivers[i].license_number[8]) &&
-                    isdigit(driverInfo.drivers[i].license_number[9]) && isdigit(driverInfo.drivers[i].license_number[10]) &&
-                    isdigit(driverInfo.drivers[i].license_number[11]) && isdigit(driverInfo.drivers[i].license_number[12])){
+                scanf("%14s", driver.license_number);
+                if(driver.license_number[0] == 'H' &&
+                    isdigit(driver.license_number[1]) && isdigit(driver.license_number[2]) &&
+                    driver.license_number[3] == '-' && isdigit(driver.license_number[4]) && isdigit(driver.license_number[5]) &&
+                    driver.license_number[6] == '-' && isdigit(driver.license_number[7]) && isdigit(driver.license_number[8]) &&
+                    isdigit(driver.license_number[9]) && isdigit(driver.license_number[10]) &&
+                    isdigit(driver.license_number[11]) && isdigit(driver.license_number[12])){
                     valid_license_number = 1;
                 } else {
                     printf("\e[0;33m\n");
@@ -418,7 +426,7 @@ void updateDriver() {
                     for(i=0;i<18;i++){
                         printf(" ");
                     }
-                    printf("* \e[0;31mInvalid input, please try again. \e[0;33m*\n");
+                    printf("* \e[0;91mInvalid input, please try again. \e[0;33m*\n");
                     for(i=0;i<18;i++){
                         printf(" ");
                     }
@@ -432,9 +440,9 @@ void updateDriver() {
 
             while (!valid_agency_code){
                 printf("                  \e[0;37mEnter driver's new agency code. Format: Hxx: \e[0;92m");
-                scanf("%3s", driverInfo.drivers[i].agency_code);
-                if(driverInfo.drivers[i].agency_code[0] == 'H' &&
-                    isdigit(driverInfo.drivers[i].agency_code[1]) && isdigit(driverInfo.drivers[i].agency_code[2])){
+                scanf("%3s", driver.agency_code);
+                if(driver.agency_code[0] == 'H' &&
+                    isdigit(driver.agency_code[1]) && isdigit(driver.agency_code[2])){
                     valid_agency_code = 1;
                 } else {
                     printf("\e[0;33m\n");
@@ -448,7 +456,7 @@ void updateDriver() {
                     for(i=0;i<18;i++){
                         printf(" ");
                     }
-                    printf("* \e[0;31mInvalid input, please try again. \e[0;33m*\n");
+                    printf("* \e[0;91mInvalid input, please try again. \e[0;33m*\n");
                     for(i=0;i<18;i++){
                         printf(" ");
                     }
@@ -462,10 +470,10 @@ void updateDriver() {
 
             while (!valid_serial_number){
                 printf("                  \e[0;37mEnter driver's new serial number. Format: xxxxxxxxx: \e[0;92m");
-                scanf("%9s", &driverInfo.drivers[i].serial_number);
-                if (strlen(driverInfo.drivers[i].serial_number) == 9){
-                    for (int j = 0; j < strlen(driverInfo.drivers[i].serial_number); j++) {
-                        if (isdigit(driverInfo.drivers[i].serial_number[j])) {
+                scanf("%9s", &driver.serial_number);
+                if (strlen(driver.serial_number) == 9){
+                    for (int i = 0; i < strlen(driver.serial_number); i++) {
+                        if (isdigit(driver.serial_number[i])) {
                             valid_serial_number = 1;
                         }
                     }
@@ -481,8 +489,8 @@ void updateDriver() {
                     printf("\n");
                     for(i=0;i<18;i++){
                         printf(" ");
-                 }
-                    printf("* \e[0;31mInvalid input, please try again. \e[0;33m*\n");
+                    }
+                    printf("* \e[0;91mInvalid input, please try again. \e[0;33m*\n");
                     for(i=0;i<18;i++){
                         printf(" ");
                     }
@@ -492,40 +500,42 @@ void updateDriver() {
                     printf("\n\n\e[0m");
                     while (getchar() != '\n');
                 }
-            }
+            }    
 
             scanf("%*c");
             printf("                  \e[0;37mEnter driver's last name: \e[0;92m");
-            scanf("%[^\n]", driverInfo.drivers[i].last_name);
-            for (int j = 0; driverInfo.drivers[i].last_name[j] != '\0'; j++) {
-                driverInfo.drivers[i].last_name[j] = toupper(driverInfo.drivers[i].last_name[j]);
+            scanf("%[^\n]", driver.last_name);
+            for (int i = 0; driver.last_name[i] != '\0'; i++) {
+                driver.last_name[i] = toupper(driver.last_name[i]);
             }
 
             scanf("%*c");
             printf("                  \e[0;37mEnter driver's first name: \e[0;92m");
-            scanf("%[^\n]", driverInfo.drivers[i].first_name);
-            for (int k = 0; driverInfo.drivers[i].first_name[k] != '\0'; k++) {
-                driverInfo.drivers[i].first_name[k] = toupper(driverInfo.drivers[i].first_name[k]);
+            scanf("%[^\n]", driver.first_name);
+            for (int j = 0; driver.first_name[j] != '\0'; j++) {
+                driver.first_name[j] = toupper(driver.first_name[j]);
             }
 
             scanf("%*c");
             printf("                  \e[0;37mEnter driver's middle name: \e[0;92m");
-            scanf("%[^\n]", driverInfo.drivers[i].middle_name);
-            for (int l = 0; driverInfo.drivers[i].middle_name[l] != '\0'; l++) {
-                driverInfo.drivers[i].middle_name[l] = toupper(driverInfo.drivers[i].middle_name[l]);
+            scanf("%[^\n]", driver.middle_name);
+            for (int k = 0; driver.middle_name[k] != '\0'; k++) {
+                driver.middle_name[k] = toupper(driver.middle_name[k]);
             }
 
             scanf("%*c");
             printf("                  \e[0;37mEnter driver's home address:\n                  - \e[0;92m");
-            scanf("%[^\n]", driverInfo.drivers[i].address);
+            scanf("%[^\n]", driver.address);
+
+            strcpy(driver.nationality, "PHL");
 
             while (!valid_sex){
                 scanf("%*c");
                 printf("                  \e[0;37mEnter driver's sex. Format: 'M' or 'F': \e[0;92m");
-                scanf("%2s", driverInfo.drivers[i].sex);
-                if((strcmp(driverInfo.drivers[i].sex, "M") == 0 || strcmp(driverInfo.drivers[i].sex, "F") == 0 || strcmp(driverInfo.drivers[i].sex, "m") == 0 || strcmp(driverInfo.drivers[i].sex, "f") == 0)){
-                    for (int l = 0; driverInfo.drivers[i].sex[l] != '\0'; l++) {
-                        driverInfo.drivers[i].sex[l] = toupper(driverInfo.drivers[i].sex[l]);
+                scanf("%2s", driver.sex);
+                if ((strcmp(driver.sex, "M") == 0 || strcmp(driver.sex, "F") == 0 || strcmp(driver.sex, "m") == 0 || strcmp(driver.sex, "f") == 0)){
+                    for (int l = 0; driver.sex[l] != '\0'; l++) {
+                        driver.sex[l] = toupper(driver.sex[l]);
                     }
                     valid_sex = 1;
                 } else {
@@ -540,7 +550,7 @@ void updateDriver() {
                     for(i=0;i<18;i++){
                         printf(" ");
                     }
-                    printf("* \e[0;31mInvalid input, please try again. \e[0;33m*\n");
+                    printf("* \e[0;91mInvalid input, please try again. \e[0;33m*\n");
                     for(i=0;i<18;i++){
                         printf(" ");
                     }
@@ -552,40 +562,41 @@ void updateDriver() {
             }
 
             printf("                  \e[0;37mEnter driver's date of birth (day). Format 'dd': \e[0;92m");
-            scanf("%d", &driverInfo.drivers[i].day_date_of_birth);
+            scanf("%d", &driver.day_date_of_birth);
 
             printf("                  \e[0;37mEnter driver's date of birth (month). Format 'mm': \e[0;92m");
-            scanf("%d", &driverInfo.drivers[i].month_date_of_birth);
+            scanf("%d", &driver.month_date_of_birth);
 
             printf("                  \e[0;37mEnter driver's date of birth (year). Format 'yyyy': \e[0;92m");
-            scanf("%d", &driverInfo.drivers[i].year_date_of_birth);
+            scanf("%d", &driver.year_date_of_birth);
 
             printf("                  \e[0;37mEnter driver's weight in kg: \e[0;92m");
-            scanf("%d", &driverInfo.drivers[i].weight);
+            scanf("%d", &driver.weight);
 
             printf("                  \e[0;37mEnter driver's height in cm: \e[0;92m");
-            scanf("%d", &driverInfo.drivers[i].height_in_cm);
+            scanf("%d", &driver.height_in_cm);
 
             printf("                  \e[0;37mEnter driver's blood type. Format: 'A', 'O', etc.: \e[0;92m");
-            scanf("%3s", driverInfo.drivers[i].blood_type);
+            scanf("%3s", driver.blood_type);
 
-            scanf("%*c");
             printf("                  \e[0;37mEnter driver's eye color: \e[0;92m");
-            scanf("%19s", driverInfo.drivers[i].eyes_color);
+            scanf("%19s", driver.eyes_color);
 
             time_t current_time;
             time(&current_time);
-            driverInfo.drivers[i].registration_date_and_time = current_time;
+            driver.registration_date_and_time = current_time;
 
             struct tm *tm = localtime(&current_time); 
 
             int year = tm->tm_year + 1900;
-            driverInfo.drivers[i].year_expiration = year + 5;
+            driver.year_expiration = year + 5;
             int month = tm->tm_mon + 1;
-            driverInfo.drivers[i].month_expiration = month;
+            driver.month_expiration = month;
             int day = tm->tm_mday + 1;
-            driverInfo.drivers[i].day_expiration = day;
-            found = 1;
+            driver.day_expiration = day;
+
+            driverInfo.drivers[driverInfo.numDrivers] = driver;
+            driverInfo.numDrivers++;
 
             printf("\e[0;33m\n");
             for(i=0;i<15;i++){
@@ -624,15 +635,13 @@ void updateDriver() {
                 printf("*");
             }
             printf("\n\n\e[0m");
-
             Sleep(2000);
             system("cls");
-            break;
+            found = 1;
         }
     }
-
     if (!found) {
-        printf("                  Driver with license number '\e[0;92m%s\e[0m' and agency code '\e[0;92m%s\e[0m' not found.\n\n", license_number, agency_code);
+        printf("                  \e[0;37mDriver with license number '\e[0;92m%s\e[0m' and agency code '\e[0;92m%s\e[0m' not found.\n", license_number, agency_code);
         Sleep(2000);
         system("cls");
     }
@@ -702,7 +711,9 @@ void searchDriver() {
 
             printf("                  \e[0;37mDate of birth: \e[0;92m%d/%d/%d\n", driverInfo.drivers[i].day_date_of_birth, driverInfo.drivers[i].month_date_of_birth, driverInfo.drivers[i].year_date_of_birth);
             printf("                  \e[0;37mWeight: \e[0;92m%dkg.\n", driverInfo.drivers[i].weight);
-            printf("                  \e[0;37mHeight: \e[0;92m%dcm.\n\n", driverInfo.drivers[i].height_in_cm);
+
+            float height_in_m = driverInfo.drivers[i].height_in_cm;
+            printf("                  \e[0;37mHeight: \e[0;92m%.2fm.\n\n", height_in_m/100);
 
             printf("                  \e[0;37mBlood Type: \e[0;92m%s\n", driverInfo.drivers[i].blood_type);
             printf("                  \e[0;37mEyes Color: \e[0;92m%s\n\n", driverInfo.drivers[i].eyes_color);
@@ -780,7 +791,7 @@ void deleteDriver() {
     for(i=0;i<34;i++){
         printf(" ");
     }
-    printf("\e[0;37mSearch Driver Menu\e[0;33m");
+    printf("\e[0;37mDelete Driver Menu\e[0;33m");
     for(i=0;i<34;i++){
         printf(" ");
     }
@@ -794,10 +805,10 @@ void deleteDriver() {
     }
     printf("\n\n");
 
-    printf("                  \e[0;37mEnter driver's license number to search: \e[0;92m");
+    printf("                  \e[0;37mEnter driver's license number to delete: \e[0;92m");
     scanf("%14s", license_number);
 
-    printf("                  \e[0;37mEnter driver's agency code to search: \e[0;92m");
+    printf("                  \e[0;37mEnter driver's agency code to delete: \e[0;92m");
     scanf("%3s", agency_code);
 
     printf("\e[0;33m\n");
@@ -941,7 +952,7 @@ int main() {
     for(i=0;i<19;i++){
         printf(" ");
     }
-    printf("\e[0;37mPROFESSIONAL DRIVER'S LICENSE MANAGEMENT SYSTEM!\e[0;33m");
+    printf("\e[0;37mPROFESSIONAL DRIVERS' LICENSE MANAGEMENT SYSTEM!\e[0;33m");
     for(i=0;i<19;i++){
         printf(" ");
     }
@@ -1027,7 +1038,7 @@ int main() {
         for(i=0;i<19;i++){
             printf(" ");
         }
-        printf("\e[0;37mPROFESSIONAL DRIVER'S LICENSE MANAGEMENT SYSTEM \e[0;33m");
+        printf("\e[0;37mPROFESSIONAL DRIVERS' LICENSE MANAGEMENT SYSTEM \e[0;33m");
         for(i=0;i<19;i++){
             printf(" ");
         }
